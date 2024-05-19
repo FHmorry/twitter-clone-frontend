@@ -1,5 +1,10 @@
+/*
+  Twitterのようなスタイルに変更
+*/
+
 .App {
   text-align: center;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
 }
 
 .App-logo {
@@ -14,7 +19,6 @@
 }
 
 .App-header {
-  background-color: #282c34;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -25,7 +29,29 @@
 }
 
 .App-link {
-  color: #61dafb;
+  color: #1DA1F2;
+  text-decoration: none;
+}
+
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #E1E8ED;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60px;
+  color: black; /* 黒字に変更 */
+  font-size: 24px;
+  font-weight: bold;
 }
 
 @keyframes App-logo-spin {
