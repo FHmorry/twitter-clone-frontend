@@ -1,47 +1,95 @@
-import React, { useState, useEffect } from 'react'; // Reactとそのフックをインポート
-import './App.css'; // アプリケーションのスタイルシートをインポート
-import axios from 'axios'; // HTTPクライアントaxiosをインポート
+import React, { useState, useEffect } from 'react';                                  // Reactとそのフックをインポート
+import './App.css';                                                                  // アプリケーションのスタイルシートをインポート
+import axios from 'axios';                                                           // HTTPクライアントaxiosをインポート
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'; // ルーティングに必要なコンポーネントをインポート
-import LoginForm from './components/Login/LoginForm'; // ログインフォームコンポーネントをインポート
-import Dashboard from './components/Dashboard/LoginUserName'; // ダッシュボードコンポーネントをインポート
+import LoginForm from './components/Login/LoginForm';                                // ログインフォームコンポーネントをインポート
+import Dashboard from './components/Dashboard/LoginUserName';                        // ダッシュボードコンポーネントをインポート
+
+// axiosのデフォルト設定をグローバルに設定
+axios.defaults.withCredentials = true;
 
 const App = () => {
-  const [user, setUser] = useState(null); // ユーザー状態を管理するステート
+  // ユーザー状態を管理するステート
+  const [user, setUser] = useState(null);
 
-  const handleLoginSuccess = (userData) => { // ログイン成功時のハンドラ
-    setUser(userData); // ユーザーデータをステートにセット
-    sessionStorage.setItem('user', JSON.stringify(userData)); // セッションストレージに保存
+  // ログイン成功時のハンドラ
+  const handleLoginSuccess = (userData) => {
+    // ユーザーデータをステートにセット
+    setUser(userData);
+    // セッションストレージに保存
+    sessionStorage.setItem('user', JSON.stringify(userData));
   };
 
-  useEffect(() => { // コンポーネントマウント時の副作用
-    const storedUser = sessionStorage.getItem('user'); // セッションストレージからユーザーデータを取得
-    if (storedUser) {
-        setUser(JSON.parse(storedUser)); // ユーザーデータをステートにセット
-    } else {
-      axios.get('http://localhost:8080/api/session') // セッションAPIにリクエスト
-          .then(response => {
-              if (response.data.user) { // ユーザーデータが存在する場合
-                  setUser(response.data.user); // ユーザーデータをステートにセット
-                  sessionStorage.setItem('user', JSON.stringify(response.data.user)); // セッションストレージに保存
-              } else {
-                  setUser(null); // ユーザーデータが存在しない場合
-              }
-          })
-          .catch(error => {
-              console.error('セッション情報取得エラー:', error); // エラーログを出力
-              setUser(null); // エラー時にユーザー状態をリセット
-          });
+  // ログアウト処理
+  const handleLogout = async () => {
+    try {
+      // バックエンドにログアウトリクエストを送信
+      const response = await axios.post('/logout', {}, {
+        withCredentials: true
+      });
+      // レスポンスが成功した場合のみ以下の処理を行う
+      if (response.status === 200) {
+        console.log('ログアウト成功: セッションストレージをクリアします');
+        // セッションストレージをクリア
+        sessionStorage.clear();
+        console.log('セッションストレージをクリアしました: ユーザー状態をリセットします');
+        // ユーザー状態をリセット
+        setUser(null);
+        console.log('ユーザー状態をリセットしました: ページをリロードします');
+        // ページをリロード
+        window.location.reload();
+      } else {
+        console.error('ログアウトに失敗しました:', response.statusText);
+      }
+    } catch (error) {
+      // ログアウトリクエスト失敗時のエラーハンドリ��グ
+      console.error('ログアウトエラー:', error);
     }
+  };
+
+  // コンポーネントマウント時の副作用
+  useEffect(() => {
+    // セッションストレージからユーザーデータを取得
+    const storedUser = sessionStorage.getItem('user');
+    if (storedUser) {
+      // ユーザーデータをステートにセット
+      setUser(JSON.parse(storedUser));
+    } else {
+      // セッションAPIにリクエスト
+      axios.get('/session')
+        .then(response => {
+          // ユーザーデータが存在する場合
+          if (response.data.user) {
+            // ユーザーデータをステートにセット
+            setUser(response.data.user);
+            // セッションストレージに保存
+            sessionStorage.setItem('user', JSON.stringify(response.data.user));
+          } else {
+            // ユーザーデータが存在しない場合
+            setUser(null);
+          }
+        })
+        .catch(error => {
+          // エラーログを出力
+          console.error('セッション情報取得エラー:', error);
+          // エラー時にユーザー状態をリセット
+          setUser(null);
+        });
+    }
+
   }, []);
 
   return (
     <Router> 
       <Routes>
-        <Route path="/" element={user ? <Navigate replace to="/dashboard" /> : <LoginForm onLogin={handleLoginSuccess} />} /> {/* ルートパスのルート */}
-        <Route path="/dashboard" element={user ? <Dashboard user={user} /> : <Navigate replace to="/" />} /> {/* ダッシュボードパスのルート */}
+        {/* ルートパスのルート */}
+        <Route path="/" element={user ? <Navigate replace to="/dashboard" /> : <LoginForm onLogin={handleLoginSuccess} />} />
+        {/* ダッシュボードパスのルート */}
+        <Route path="/dashboard" element={user ? <Dashboard user={user} onLogout={handleLogout} /> : <Navigate replace to="/" />} />
       </Routes>
     </Router>
   );
 };
 
-export default App; // Appコンポーネントをエクスポート
+// Appコンポーネントをエクスポート
+export default App;

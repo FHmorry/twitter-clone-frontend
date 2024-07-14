@@ -10,12 +10,18 @@ const LoginForm = ({ onLogin }) => {
     const handleLogin = async (event) => {
         event.preventDefault();  // フォームのデフォルトの送信を防止
         try {
-            const response = await axios.post('/login', { username, password });  // ログインAPIにPOSTリクエストを送信
+            const response = await axios.post('/login', { username, password }, { withCredentials: true });  // ログインAPIにPOSTリクエストを送信
             if (response.data) {
                 onLogin(response.data);  // レスポンスデータがあれば親コンポーネントのコールバック関数を呼び出す
             }
         } catch (error) {
-            console.error('Login error:', error);  // エラーが発生した場合、コンソールにエラーを出力
+            if (error.response) {
+                console.log('Error response:', error.response);  // エラーレスポンスを出力
+            } else if (error.request) {
+                console.log('Error request:', error.request);  // エラーレクエストを出力
+            } else {
+                console.log('Error message:', error.message);  // エラーメッセージを出力
+            }
         }
     };
 
