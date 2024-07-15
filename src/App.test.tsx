@@ -1,12 +1,13 @@
-import React, { FC } from 'react';
+import React from 'react';
 import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom/extend-expect';
 import App from './App';
 
 interface TestProps {
   // プロパティの型定義（必要に応じて追加）
 }
 
-const TestComponent: FC<TestProps> = (props) => {
+const TestComponent: React.FC<TestProps> = (props) => {
   return (
     <div>
       <App />

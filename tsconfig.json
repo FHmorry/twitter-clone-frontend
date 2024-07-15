@@ -19,7 +19,8 @@
       "esnext"
     ],
     "allowSyntheticDefaultImports": true,
-    "noEmit": true
+    "noEmit": true,
+    "types": ["jest"]
   },
   "include": [
     "src/**/*"
