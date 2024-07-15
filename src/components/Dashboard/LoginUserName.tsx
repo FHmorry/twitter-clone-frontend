@@ -1,7 +1,12 @@
-import React from 'react';
+import React, { FC } from 'react';
 import LogoutButton from '../Logout/LogoutButton'; // LogoutButtonコンポーネントをインポート
 
-const Dashboard = ({ user, onLogout }) => {
+interface DashboardProps {
+  user: { username: string } | null;
+  onLogout: () => void;
+}
+
+const Dashboard: FC<DashboardProps> = ({ user, onLogout }) => {
   return (
     <div>
       <p>{user ? `${user.username}でログインしています` : 'ログイン情報がありません。'}</p>

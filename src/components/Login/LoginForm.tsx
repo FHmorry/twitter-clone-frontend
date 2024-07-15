@@ -1,26 +1,35 @@
-import React, { useState } from 'react';  // ReactとuseStateフックをインポート
+import React, { useState, FC } from 'react';  // React、useStateフック、FCをインポート
 import axios from 'axios';  // axiosライブラリをインポート
 
+// LoginFormコンポーネントのプロパティの型定義
+interface LoginFormProps {
+    onLogin: (data: any) => void;
+}
+
 // LoginFormコンポーネントの定義、onLoginプロップを受け取る
-const LoginForm = ({ onLogin }) => {
+const LoginForm: FC<LoginFormProps> = ({ onLogin }) => {
     const [username, setUsername] = useState('');  // ユーザー名の状態を管理
     const [password, setPassword] = useState('');  // パスワードの状態を管理
 
     // ログイン処理を行う非同期関数
-    const handleLogin = async (event) => {
+    const handleLogin = async (event: React.FormEvent) => {  // 'event'の型を明示的に指定
         event.preventDefault();  // フォームのデフォルトの送信を防止
         try {
             const response = await axios.post('/login', { username, password }, { withCredentials: true });  // ログインAPIにPOSTリクエストを送信
             if (response.data) {
                 onLogin(response.data);  // レスポンスデータがあれば親コンポーネントのコールバック関数を呼び出す
             }
-        } catch (error) {
-            if (error.response) {
-                console.log('Error response:', error.response);  // エラーレスポンスを出力
-            } else if (error.request) {
-                console.log('Error request:', error.request);  // エラーレクエストを出力
+        } catch (error: unknown) {  // 'error'の型をunknownに指定
+            if (axios.isAxiosError(error)) {  // axiosエラーかどうかをチェック
+                if (error.response) {
+                    console.log('Error response:', error.response);  // エラーレスポンスを出力
+                } else if (error.request) {
+                    console.log('Error request:', error.request);  // エラーレクエストを出力
+                } else {
+                    console.log('Error message:', error.message);  // エラーメッセージを出力
+                }
             } else {
-                console.log('Error message:', error.message);  // エラーメッセージを出力
+                console.log('Unexpected error:', error);  // 予期しないエラーを出力
             }
         }
     };

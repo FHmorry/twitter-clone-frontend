@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';                                  // Reactとそのフックをインポート
+import React, { useState, useEffect, FC } from 'react';                                  // Reactとそのフックをインポート
 import './App.css';                                                                  // アプリケーションのスタイルシートをインポート
 import axios from 'axios';                                                           // HTTPクライアントaxiosをインポート
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'; // ルーティングに必要なコンポーネントをインポート
@@ -8,12 +8,15 @@ import Dashboard from './components/Dashboard/LoginUserName';                   
 // axiosのデフォルト設定をグローバルに設定
 axios.defaults.withCredentials = true;
 
-const App = () => {
+// Appコンポーネントのプロパティの型定義
+interface AppProps {}
+
+const App: FC<AppProps> = (props) => {
   // ユーザー状態を管理するステート
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any>(null);
 
   // ログイン成功時のハンドラ
-  const handleLoginSuccess = (userData) => {
+  const handleLoginSuccess = (userData: any) => {
     // ユーザーデータをステートにセット
     setUser(userData);
     // セッションストレージに保存
@@ -42,7 +45,7 @@ const App = () => {
         console.error('ログアウトに失敗しました:', response.statusText);
       }
     } catch (error) {
-      // ログアウトリクエスト失敗時のエラーハンドリ��グ
+      // ログアウトリクエスト失敗時のエラーハンドリング
       console.error('ログアウトエラー:', error);
     }
   };

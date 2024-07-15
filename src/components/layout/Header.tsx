@@ -1,6 +1,10 @@
-import React from 'react';
+import React, { FC } from 'react';
 
-const Header = ({ username }) => {
+interface HeaderProps {
+  username?: string;
+}
+
+const Header: FC<HeaderProps> = ({ username }) => {
   return (
     <header>
       <h1>Twitter Clone</h1>
