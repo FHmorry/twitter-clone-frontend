@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import LogoutButton from '../Logout/LogoutButton'; // LogoutButtonコンポーネントをインポート
+import LogoutButton from '../Auth/LogoutButton'; // LogoutButtonコンポーネントをインポート
 
 interface DashboardProps {
   user: { username: string } | null;

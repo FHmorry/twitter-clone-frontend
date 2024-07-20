@@ -2,7 +2,7 @@ import React, { useState, useEffect, FC } from 'react';                         
 import './App.css';                                                                  // アプリケーションのスタイルシートをインポート
 import axios from 'axios';                                                           // HTTPクライアントaxiosをインポート
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'; // ルーティングに必要なコンポーネントをインポート
-import LoginForm from './components/Login/LoginForm';                                // ログインフォームコンポーネントをインポート
+import LoginForm from './components/Auth/LoginForm';                                // ログインフォームコンポーネントをインポート
 import Dashboard from './components/Dashboard/LoginUserName';                        // ダッシュボードコンポーネントをインポート
 
 // axiosのデフォルト設定をグローバルに設定
