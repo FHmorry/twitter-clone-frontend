@@ -2,15 +2,15 @@ import React, { FC } from 'react';
 import LogoutButton from '../Auth/LogoutButton'; // LogoutButtonコンポーネントをインポート
 
 interface DashboardProps {
-  user: { username: string } | null;
-  onLogout: () => void;
+  username: string;
+  onLogout: () => Promise<void>;
 }
 
-const Dashboard: FC<DashboardProps> = ({ user, onLogout }) => {
+const Dashboard: FC<DashboardProps> = ({ username, onLogout }) => {
   return (
     <div>
-      <p>{user ? `${user.username}でログインしています` : 'ログイン情報がありません。'}</p>
-      {user && <LogoutButton onLogout={onLogout} />} {/* ユーザーがログインしている場合にログアウトボタンを表示 */}
+      <p>{username ? `${username}でログインしています` : 'ログイン情報がありません。'}</p>
+      {username && <LogoutButton onLogout={onLogout} />} {/* ユーザーがログインしている場合にログアウトボタンを表示 */}
     </div>
   );
 };

@@ -1,9 +1,10 @@
 import React, { useState, useEffect, FC } from 'react';                                  // Reactとそのフックをインポート
 import './App.css';                                                                  // アプリケーションのスタイルシートをインポート
 import axios from 'axios';                                                           // HTTPクライアントaxiosをインポート
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'; // ルーティングに必要なコンポーネントをインポート
+import { BrowserRouter as Router, Route, Routes, Navigate, Link } from 'react-router-dom'; // ルーティングに必要なコンポーネントをインポート
 import LoginForm from './components/Auth/LoginForm';                                // ログインフォームコンポーネントをインポート
 import Dashboard from './components/Dashboard/LoginUserName';                        // ダッシュボードコンポーネントをインポート
+import RegisterForm from './components/Auth/RegisterForm'; // 新規登録フォームコンポーネントをインポート
 
 // axiosのデフォルト設定をグローバルに設定
 axios.defaults.withCredentials = true;
@@ -11,16 +12,16 @@ axios.defaults.withCredentials = true;
 // Appコンポーネントのプロパティの型定義
 interface AppProps {}
 
+// Appコンポーネントの定義
 const App: FC<AppProps> = (props) => {
   // ユーザー状態を管理するステート
-  const [user, setUser] = useState<any>(null);
-
+  const [user, setUser] = useState<string | null>(null);
   // ログイン成功時のハンドラ
-  const handleLoginSuccess = (userData: any) => {
-    // ユーザーデータをステートにセット
-    setUser(userData);
+  const handleLoginSuccess = (username: string) => {
+    // ユーザー名をステートにセット
+    setUser(username);
     // セッションストレージに保存
-    sessionStorage.setItem('user', JSON.stringify(userData));
+    sessionStorage.setItem('user', username);
   };
 
   // ログアウト処理
@@ -32,49 +33,52 @@ const App: FC<AppProps> = (props) => {
       });
       // レスポンスが成功した場合のみ以下の処理を行う
       if (response.status === 200) {
-        console.log('ログアウト成功: セッションストレージをクリアします');
         // セッションストレージをクリア
         sessionStorage.clear();
-        console.log('セッションストレージをクリアしました: ユーザー状態をリセットします');
         // ユーザー状態をリセット
         setUser(null);
-        console.log('ユーザー状態をリセットしました: ページをリロードします');
         // ページをリロード
         window.location.reload();
-      } else {
-        console.error('ログアウトに失敗しました:', response.statusText);
       }
     } catch (error) {
       // ログアウトリクエスト失敗時のエラーハンドリング
-      console.error('ログアウトエラー:', error);
     }
+  };
+
+  const handleRegisterSuccess = () => {
+    clearLocalSession();
+    // ログインページにリダイレクト
+    window.location.href = '/';
+  };
+
+  const clearLocalSession = () => {
+    sessionStorage.clear();
+    setUser(null);
   };
 
   // コンポーネントマウント時の副作用
   useEffect(() => {
-    // セッションストレージからユーザーデータを取得
+    // セッションストレージからユーザー名を取得
     const storedUser = sessionStorage.getItem('user');
     if (storedUser) {
-      // ユーザーデータをステートにセット
-      setUser(JSON.parse(storedUser));
+      // ユーザー名をステートにセット
+      setUser(storedUser);
     } else {
       // セッションAPIにリクエスト
       axios.get('/session')
         .then(response => {
-          // ユーザーデータが存在する場合
-          if (response.data.user) {
-            // ユーザーデータをステートにセット
-            setUser(response.data.user);
+          // ユーザー名が存在する場合
+          if (response.data.username) {
+            // ユーザー名をステートにセット
+            setUser(response.data.username);
             // セッションストレージに保存
-            sessionStorage.setItem('user', JSON.stringify(response.data.user));
+            sessionStorage.setItem('user', response.data.username);
           } else {
-            // ユーザーデータが存在しない場合
+            // ユーザー名が存在しない場合
             setUser(null);
           }
         })
         .catch(error => {
-          // エラーログを出力
-          console.error('セッション情報取得エラー:', error);
           // エラー時にユーザー状態をリセット
           setUser(null);
         });
@@ -86,9 +90,15 @@ const App: FC<AppProps> = (props) => {
     <Router> 
       <Routes>
         {/* ルートパスのルート */}
-        <Route path="/" element={user ? <Navigate replace to="/dashboard" /> : <LoginForm onLogin={handleLoginSuccess} />} />
+        <Route path="/" element={user ? <Navigate replace to="/dashboard" /> : 
+          <>
+            <LoginForm onLogin={handleLoginSuccess} />
+            <Link to="/register">新規登録</Link>
+          </>
+        } />
         {/* ダッシュボードパスのルート */}
-        <Route path="/dashboard" element={user ? <Dashboard user={user} onLogout={handleLogout} /> : <Navigate replace to="/" />} />
+        <Route path="/dashboard" element={user ? <Dashboard username={user} onLogout={handleLogout} /> : <Navigate replace to="/" />} />
+        <Route path="/register" element={user ? <Navigate replace to="/dashboard" /> : <RegisterForm onRegisterSuccess={handleRegisterSuccess} />} />
       </Routes>
     </Router>
   );
